@@ -1,11 +1,15 @@
 from fastapi import FastAPI
 
-app = FastAPI()
+from app.auth.router import router as auth_router
 
-@app.get("/health")
+app = FastAPI(
+    title="IJMS API",
+    description="Integrated Judicial Management System API",
+    version="1.0.0"
+)
 
-def health_check():
+app.include_router(
+    auth_router,
+    prefix = ("/api/v1")
 
-    return {"status": "healthy"}
-
-
+)
