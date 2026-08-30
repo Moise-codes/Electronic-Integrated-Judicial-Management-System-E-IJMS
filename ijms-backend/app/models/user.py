@@ -10,6 +10,7 @@ class UserRole(str,Enum):
     LAWYER =  "lawyer"
     CLERK =  "clerk"
     CITIZEN  = "citizen"
+    ADMIN = "admin"
 
 
 class User(Base):
