@@ -130,4 +130,9 @@ class Case(Base):
         back_populates = "case",
         cascade = "all, delete-orphan",
     )
-    
+    judgment = relationship(
+    "Judgment",
+    back_populates="case",
+    uselist=False,
+    cascade="all, delete-orphan",
+)
