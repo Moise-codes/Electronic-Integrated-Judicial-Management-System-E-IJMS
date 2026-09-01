@@ -20,7 +20,7 @@
 ### 🔐 Authentication & Role-Based Access Control (RBAC)
 - **Role Permissions**: Granular access control for **Judges**, **Registrars**, **Clerks**, **Lawyers**, **Litigants/Citizens**, and **System Administrators**.
 - **Secure Authentication**: JWT Access & Refresh token architecture with Argon2 password hashing.
-- **Multi-step Account Management**: Email verification, secure password reset, and session audit tracking.
+- **Email Notifications & Verification**: Integrated SMTP service for email verification, password reset tokens, and judicial notice alerts.
 
 ### 📅 Hearing & Calendar Scheduling
 - **Courtroom Calendar**: Conflict-free scheduling of court hearings and proceedings.
@@ -72,28 +72,97 @@
 
 ### Backend
 - **Framework**: [FastAPI](https://fastapi.tiangolo.com/) (Python 3.10+)
-- **ORM & Database**: [SQLAlchemy 2.0](https://www.sqlalchemy.org/) (Async engine) & [PostgreSQL](https://www.postgresql.org/)
+- **ORM & Database**: [SQLAlchemy 2.0](https://www.sqlalchemy.org/) (Async engine) & [PostgreSQL](https://www.postgresql.org/) (via `psycopg3`)
 - **Database Migrations**: [Alembic](https://alembic.sqlalchemy.org/)
 - **Security & Tokens**: PyJWT, Passlib with Argon2/Bcrypt
 - **Validation**: Pydantic v2
+- **Email Service**: SMTP for verification emails and password reset flows
 
 ---
 
-## 📂 Project Structure
+## 🔑 Environment Variables Configuration
+
+The repository includes template configuration files (`.env.example`) for both the backend and frontend services.
+
+### 1. Backend Environment (`ijms-backend/.env.example`)
+
+Copy `ijms-backend/.env.example` to `ijms-backend/.env`:
+
+```env
+# Application General Settings
+APP_NAME=Integrated Judicial Management System
+ENVIRONMENT=development
+PORT=8000
+
+# PostgreSQL Database Connection
+DATABASE_URL=postgresql+psycopg://username:password@localhost:5432/IJMS
+
+# JWT Security & Authentication
+JWT_SECRET_KEY=replace_with_a_secure_random_secret
+JWT_ALGORITHM=HS256
+ACCESS_TOKEN_EXPIRE_MINUTES=30
+
+# Frontend CORS URL
+FRONTEND_URL=http://localhost:3000
+
+# SMTP Email Configuration (Email Verification & Password Reset)
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_USERNAME=your_email@gmail.com
+SMTP_PASSWORD=your_app_specific_password
+SMTP_FROM=noreply@justicedesk.gov.rw
+```
+
+#### Field Explanations:
+| Variable | Description |
+| :--- | :--- |
+| `APP_NAME` | The official name of the application displayed in system logs and email headers. |
+| `ENVIRONMENT` | Running environment (`development`, `production`, or `testing`). |
+| `PORT` | Backend FastAPI server port (default: `8000`). |
+| `DATABASE_URL` | PostgreSQL connection string using `psycopg3` driver (`postgresql+psycopg://...`). |
+| `JWT_SECRET_KEY` | Secret key used to cryptographically sign access and refresh tokens. |
+| `JWT_ALGORITHM` | Cryptographic algorithm for signing JWT tokens (default: `HS256`). |
+| `ACCESS_TOKEN_EXPIRE_MINUTES` | Lifetime of user access tokens in minutes (default: `30`). |
+| `FRONTEND_URL` | Origin URL of the Next.js frontend for CORS validation. |
+| `SMTP_HOST` | Host address for outgoing email server (e.g., `smtp.gmail.com` or custom SMTP server). |
+| `SMTP_PORT` | Port for SMTP server (usually `587` for TLS or `465` for SSL). |
+| `SMTP_USERNAME` | Authenticated email address used to dispatch notification emails. |
+| `SMTP_PASSWORD` | Password or App Password for the SMTP server account. |
+| `SMTP_FROM` | Sender display address shown on system emails (e.g. `noreply@justicedesk.gov.rw`). |
+
+---
+
+### 2. Frontend Environment (`.env.example`)
+
+Copy `.env.example` in the root folder to `.env.local`:
+
+```env
+NEXT_PUBLIC_API_URL=http://127.0.0.1:8000
+```
+
+#### Field Explanation:
+| Variable | Description |
+| :--- | :--- |
+| `NEXT_PUBLIC_API_URL` | Base URL pointing to the FastAPI backend API endpoints. |
+
+---
+
+## 📁 Project Structure
 
 ```
 .
 ├── ijms-backend/                 # FastAPI Backend Application
 │   ├── alembic/                  # Database migration scripts
 │   ├── app/                      # Main application package
-│   │   ├── auth/                 # Authentication routers, services & schemas
+│   │   ├── auth/                 # Auth routers, services, schemas & SMTP helpers
 │   │   ├── cases/                # Case management & assignments router
 │   │   ├── database/             # Async database session & base model
 │   │   ├── models/               # SQLAlchemy ORM models (Case, Assignment, User, etc.)
 │   │   ├── schemas/              # Pydantic request/response schemas
 │   │   ├── services/             # Core business logic services
 │   │   └── main.py               # FastAPI entry point & middleware
-│   ├── alembic.ini               # Alembic configuration
+│   ├── .env.example              # Backend environment template (DB, JWT, SMTP)
+│   ├── alembic.ini               # Alembic migration config
 │   └── requirements.txt          # Python dependency specifications
 │
 ├── src/                          # Next.js Frontend Application
@@ -109,6 +178,7 @@
 │   ├── services/                 # API service handlers
 │   └── types/                    # TypeScript interfaces & types
 │
+├── .env.example                  # Frontend environment template
 ├── public/                       # Static public assets & brand media
 ├── package.json                  # Frontend dependencies & scripts
 ├── tailwind.config.ts            # Tailwind styling tokens & configuration
@@ -148,17 +218,9 @@ Ensure you have the following installed on your machine:
    ```
 
 4. **Configure Environment Variables**:
-   Copy `.env.example` to `.env` and fill in your database credentials:
+   Copy `.env.example` to `.env` and fill in your database & SMTP credentials:
    ```bash
    cp .env.example .env
-   ```
-   *Example `.env` configuration*:
-   ```env
-   DATABASE_URL=postgresql+asyncpg://postgres:postgres@localhost:5432/ijms_db
-   SECRET_KEY=your_super_secret_jwt_key
-   ALGORITHM=HS256
-   ACCESS_TOKEN_EXPIRE_MINUTES=30
-   REFRESH_TOKEN_EXPIRE_DAYS=7
    ```
 
 5. **Run Database Migrations**:
@@ -187,9 +249,9 @@ Ensure you have the following installed on your machine:
    ```
 
 3. **Configure Environment Variables**:
-   Create a `.env.local` file in the root directory:
-   ```env
-   NEXT_PUBLIC_API_URL=http://localhost:8000/api/v1
+   Copy `.env.example` to `.env.local`:
+   ```bash
+   cp .env.example .env.local
    ```
 
 4. **Start the Next.js Development Server**:
@@ -204,7 +266,8 @@ Ensure you have the following installed on your machine:
 
 1. **User Onboarding & Authentication**:
    - Users register with their assigned role (Citizen/Litigant, Lawyer, Judicial Officer).
-   - System authenticates credentials and issues JWT tokens stored securely.
+   - The backend sends a verification link via SMTP using the configured mail host.
+   - Credentials are authenticated and JWT tokens are returned upon successful login.
    
 2. **Filing & Processing Cases**:
    - Litigants or attorneys submit new case details and supporting documents via `/cases/new`.
