@@ -124,3 +124,10 @@ class Case(Base):
         back_populates="case",
         cascade="all, delete-orphan",
     )
+
+    participants = relationship(
+        "CaseParticipant",
+        back_populates = "case",
+        cascade = "all, delete-orphan",
+    )
+    

@@ -1,3 +1,4 @@
+from app.models.case_participant import CaseParticipant
 from app.models.document import Document
 from app.models.hearing import Hearing 
 from app.core.config import settings
