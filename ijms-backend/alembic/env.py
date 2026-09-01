@@ -1,3 +1,4 @@
+from app.models.document import Document
 from app.models.hearing import Hearing 
 from app.core.config import settings
 from app.database.base import Base
