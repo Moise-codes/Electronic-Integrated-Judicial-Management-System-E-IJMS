@@ -1,0 +1,1 @@
+import UnavailablePage from "@/components/unavailable-page"; export default function Page() { return <UnavailablePage title="Users" description="Administrative user management for authorized IJMS administrators."/> }

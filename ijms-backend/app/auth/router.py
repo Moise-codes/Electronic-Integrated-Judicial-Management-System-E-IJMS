@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import Session
 
 from app.auth.dependencies import get_current_user
 from app.auth.schemas import (
@@ -24,14 +24,14 @@ router = APIRouter(
     response_model=UserResponse,
     status_code=status.HTTP_201_CREATED,
 )
-async def register(
+def register(
     data: RegisterRequest,
-    db: AsyncSession = Depends(get_db),
+    db: Session = Depends(get_db),
 ):
     """Register a new IJMS user."""
 
     try:
-        user = await register_user(db, data)
+        user = register_user(db, data)
 
         return user
 
@@ -46,14 +46,14 @@ async def register(
     "/login",
     response_model=TokenResponse,
 )
-async def login(
+def login(
     data: LoginRequest,
-    db: AsyncSession = Depends(get_db),
+    db: Session = Depends(get_db),
 ):
     """Authenticate a user and return an access token."""
 
     try:
-        access_token = await login_user(db, data)
+        access_token = login_user(db, data)
 
         return TokenResponse(
             access_token=access_token,
@@ -71,7 +71,7 @@ async def login(
     "/me",
     response_model=UserResponse,
 )
-async def get_me(
+def get_me(
     current_user: User = Depends(get_current_user),
 ):
     """Return the currently authenticated user."""

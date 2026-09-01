@@ -1,0 +1,1 @@
+import UnavailablePage from "@/components/unavailable-page"; export default function Page() { return <UnavailablePage title="Hearing details" description="The IJMS API does not currently provide hearing records."/> }

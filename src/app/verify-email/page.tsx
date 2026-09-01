@@ -1,0 +1,1 @@
+import { InfoAuth } from "@/components/auth"; export default function Page() { return <InfoAuth title="Verify your email" description="Email verification will be available when it is enabled by the IJMS API."/> }

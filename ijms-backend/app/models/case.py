@@ -1,7 +1,7 @@
 from datetime import datetime
 from enum import Enum
 
-from sqlalchemy import DateTime, Enum as SQLEnum, ForeignKey, String, Text
+from sqlalchemy import Enum as SQLEnum, ForeignKey, String, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database.base import Base
@@ -64,6 +64,7 @@ class Case(Base):
         SQLEnum(CasePriority),
         default=CasePriority.MEDIUM,
         nullable=False,
+        index=True,
     )
 
     plaintiff_id: Mapped[int] = mapped_column(
@@ -90,19 +91,16 @@ class Case(Base):
     )
 
     created_at: Mapped[datetime] = mapped_column(
-        DateTime,
         default=datetime.utcnow,
         nullable=False,
     )
 
     updated_at: Mapped[datetime] = mapped_column(
-        DateTime,
         default=datetime.utcnow,
         onupdate=datetime.utcnow,
         nullable=False,
     )
 
-    # User relationships
     plaintiff = relationship(
         "User",
         foreign_keys=[plaintiff_id],
@@ -118,21 +116,33 @@ class Case(Base):
         foreign_keys=[assigned_lawyer_id],
     )
 
-    # Hearing relationship
+    participants = relationship(
+        "CaseParticipant",
+        back_populates="case",
+        cascade="all, delete-orphan",
+    )
+
+    assignments = relationship(
+        "CaseAssignment",
+        back_populates="case",
+        cascade="all, delete-orphan",
+    )
+
     hearings = relationship(
         "Hearing",
         back_populates="case",
         cascade="all, delete-orphan",
     )
 
-    participants = relationship(
-        "CaseParticipant",
-        back_populates = "case",
-        cascade = "all, delete-orphan",
+    documents = relationship(
+        "Document",
+        back_populates="case",
+        cascade="all, delete-orphan",
     )
+
     judgment = relationship(
-    "Judgment",
-    back_populates="case",
-    uselist=False,
-    cascade="all, delete-orphan",
-)
+        "Judgment",
+        back_populates="case",
+        uselist=False,
+        cascade="all, delete-orphan",
+    )

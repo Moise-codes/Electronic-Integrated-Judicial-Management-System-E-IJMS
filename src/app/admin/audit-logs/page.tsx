@@ -1,0 +1,1 @@
+import UnavailablePage from "@/components/unavailable-page"; export default function Page() { return <UnavailablePage title="Audit logs" description="Administrative visibility into accountable system activity."/> }

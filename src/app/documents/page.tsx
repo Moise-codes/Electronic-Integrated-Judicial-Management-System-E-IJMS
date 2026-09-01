@@ -1,0 +1,1 @@
+import UnavailablePage from "@/components/unavailable-page"; export default function Page() { return <UnavailablePage title="Documents" description="Access case-related document records through secure IJMS services."/> }

@@ -1,0 +1,1 @@
+import { InfoAuth } from "@/components/auth"; export default function Page() { return <InfoAuth title="Password assistance" description="Secure password recovery is handled through authorized IJMS account services."/> }

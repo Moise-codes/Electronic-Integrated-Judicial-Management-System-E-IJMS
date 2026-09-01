@@ -6,13 +6,20 @@ from app.models.case import CasePriority, CaseStatus
 
 
 class CaseCreate(BaseModel):
-    case_number: str
     title: str
     description: str | None = None
     case_type: str
-    plaintiff_id: int
     defendant_name: str
     priority: CasePriority = CasePriority.MEDIUM
+
+
+class CaseUpdate(BaseModel):
+    title: str | None = None
+    description: str | None = None
+    case_type: str | None = None
+    defendant_name: str | None = None
+    priority: CasePriority | None = None
+    status: CaseStatus | None = None
 
 
 class CaseStatusUpdate(BaseModel):
@@ -20,7 +27,8 @@ class CaseStatusUpdate(BaseModel):
 
 
 class CaseAssignment(BaseModel):
-    user_id: int
+    judge_id: int | None = None
+    lawyer_id: int | None = None
 
 
 class CaseResponse(BaseModel):

@@ -1,0 +1,2 @@
+import { api } from "@/lib/api-client"; import type { User, UserRole } from "@/types";
+export const authService = { login: (email: string, password: string) => api<{ access_token: string; token_type: string }>("/api/v1/auth/login", { method: "POST", body: JSON.stringify({ email, password }) }), register: (data: { firstname: string; lastname: string; email: string; password: string; role?: UserRole }) => api<User>("/api/v1/auth/register", { method: "POST", body: JSON.stringify(data) }), me: (token: string) => api<User>("/api/v1/auth/me", {}, token) };

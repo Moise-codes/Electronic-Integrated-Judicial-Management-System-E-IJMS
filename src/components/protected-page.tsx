@@ -1,0 +1,3 @@
+"use client";
+import { useEffect } from "react"; import { useRouter } from "next/navigation"; import { AppShell } from "@/components/app-shell"; import { useAuth } from "@/components/providers"; import { Skeleton } from "@/components/ui";
+export default function ProtectedPage({ children }: { children: React.ReactNode }) { const { ready, user } = useAuth(); const router = useRouter(); useEffect(() => { if (ready && !user) router.replace("/login"); }, [ready, user, router]); if (!ready || !user) return <div className="min-h-screen bg-canvas p-8"><Skeleton className="mx-auto h-12 max-w-7xl"/><Skeleton className="mx-auto mt-8 h-72 max-w-7xl"/></div>; return <AppShell>{children}</AppShell> }

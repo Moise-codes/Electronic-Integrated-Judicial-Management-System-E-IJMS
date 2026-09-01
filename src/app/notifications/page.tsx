@@ -1,0 +1,1 @@
+import UnavailablePage from "@/components/unavailable-page"; export default function Page() { return <UnavailablePage title="Notifications" description="Stay informed about updates relevant to your justice workspace."/> }

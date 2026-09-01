@@ -1,0 +1,1 @@
+import UnavailablePage from "@/components/unavailable-page"; export default function Page() { return <UnavailablePage title="Hearings" description="Review scheduled judicial hearings and related case activity."/> }

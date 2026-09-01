@@ -1,0 +1,1 @@
+import UnavailablePage from "@/components/unavailable-page"; export default function Page() { return <UnavailablePage title="Judgment details" description="The IJMS API does not currently provide judgment records."/> }

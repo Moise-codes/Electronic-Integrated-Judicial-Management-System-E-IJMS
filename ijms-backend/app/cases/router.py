@@ -85,35 +85,16 @@ def get_single_case(
             detail="Case not found",
         )
 
-    # Admins can access every case.
     if current_user.role == UserRole.ADMIN:
         return case
 
-    # Citizens can access their own cases.
-    if (
-        current_user.role == UserRole.CITIZEN
-        and case.plaintiff_id != current_user.id
-    ):
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="You are not allowed to access this case",
-        )
+    allowed = (
+        case.plaintiff_id == current_user.id
+        or case.assigned_judge_id == current_user.id
+        or case.assigned_lawyer_id == current_user.id
+    )
 
-    # Judges can access assigned cases.
-    if (
-        current_user.role == UserRole.JUDGE
-        and case.assigned_judge_id != current_user.id
-    ):
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="You are not allowed to access this case",
-        )
-
-    # Lawyers can access assigned cases.
-    if (
-        current_user.role == UserRole.LAWYER
-        and case.assigned_lawyer_id != current_user.id
-    ):
+    if not allowed:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="You are not allowed to access this case",

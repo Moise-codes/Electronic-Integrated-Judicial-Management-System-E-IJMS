@@ -1,7 +1,7 @@
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import Session
 
 from app.auth.security import decode_access_token
 from app.database.connection import get_db
@@ -13,9 +13,9 @@ oauth2_scheme = OAuth2PasswordBearer(
 )
 
 
-async def get_current_user(
+def get_current_user(
     token: str = Depends(oauth2_scheme),
-    db: AsyncSession = Depends(get_db),
+    db: Session = Depends(get_db),
 ) -> User:
     """Get the currently authenticated user."""
 
@@ -46,11 +46,9 @@ async def get_current_user(
             headers={"WWW-Authenticate": "Bearer"},
         )
 
-    result = await db.execute(
+    user = db.execute(
         select(User).where(User.id == user_id)
-    )
-
-    user = result.scalar_one_or_none()
+    ).scalar_one_or_none()
 
     if user is None:
         raise HTTPException(

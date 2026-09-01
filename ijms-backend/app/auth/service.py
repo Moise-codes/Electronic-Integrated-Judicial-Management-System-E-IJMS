@@ -1,23 +1,18 @@
-from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import Session
 
 from app.auth.schemas import LoginRequest, RegisterRequest
 from app.auth.security import create_access_token, hash_password, verify_password
 from app.models.user import User
 
 
-async def register_user(
-    db: AsyncSession,
+def register_user(
+    db: Session,
     data: RegisterRequest,
 ) -> User:
     """Register a new user."""
 
     # Check whether email already exists
-    result = await db.execute(
-        select(User).where(User.email == data.email)
-    )
-
-    existing_user = result.scalar_one_or_none()
+    existing_user = db.query(User).filter(User.email == data.email).first()
 
     if existing_user:
         raise ValueError("A user with this email already exists.")
@@ -32,25 +27,20 @@ async def register_user(
     )
 
     db.add(user)
-
-    await db.commit()
-    await db.refresh(user)
+    db.commit()
+    db.refresh(user)
 
     return user
 
 
-async def login_user(
-    db: AsyncSession,
+def login_user(
+    db: Session,
     data: LoginRequest,
 ) -> str:
     """Authenticate a user and return a JWT access token."""
 
     # Find user by email
-    result = await db.execute(
-        select(User).where(User.email == data.email)
-    )
-
-    user = result.scalar_one_or_none()
+    user = db.query(User).filter(User.email == data.email).first()
 
     # User doesn't exist
     if not user:
