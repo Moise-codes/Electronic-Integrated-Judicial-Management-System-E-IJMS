@@ -12,3 +12,4 @@ from app.models.document import Document
 from app.models.notification import Notification
 from app.models.audit_log import AuditLog
 from app.models.judgment import Judgment
+from app.models.case_participant import CaseParticipant

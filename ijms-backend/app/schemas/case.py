@@ -1,34 +1,26 @@
 from datetime import datetime
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict
 
 from app.models.case import CasePriority, CaseStatus
 
 
 class CaseCreate(BaseModel):
-    title: str = Field(..., min_length=3, max_length=255)
+    case_number: str
+    title: str
     description: str | None = None
-    case_type: str = Field(..., min_length=2, max_length=100)
+    case_type: str
+    plaintiff_id: int
+    defendant_name: str
     priority: CasePriority = CasePriority.MEDIUM
-    defendant_name: str = Field(..., min_length=2, max_length=255)
 
 
-class CaseUpdate(BaseModel):
-    title: str | None = Field(None, min_length=3, max_length=255)
-    description: str | None = None
-    case_type: str | None = Field(None, min_length=2, max_length=100)
-    status: CaseStatus | None = None
-    priority: CasePriority | None = None
-    defendant_name: str | None = Field(
-        None,
-        min_length=2,
-        max_length=255,
-    )
+class CaseStatusUpdate(BaseModel):
+    status: CaseStatus
 
 
 class CaseAssignment(BaseModel):
-    judge_id: int | None = None
-    lawyer_id: int | None = None
+    user_id: int
 
 
 class CaseResponse(BaseModel):
