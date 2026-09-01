@@ -1,36 +1,37 @@
-from logging.config import fileConfig
-
-from alembic import context
-from sqlalchemy import create_engine, pool
-
+from app.models.hearing import Hearing 
 from app.core.config import settings
 from app.database.base import Base
+
 from app.models.user import User
+from app.models.case import Case
+
+from logging.config import fileConfig
+
+from sqlalchemy import engine_from_config
+from sqlalchemy import pool
+
+from alembic import context
 
 
-# Alembic Config object
 config = context.config
 
-
-# Configure Python logging
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
 
-# SQLAlchemy metadata for Alembic autogenerate
 target_metadata = Base.metadata
+
+config.set_main_option(
+    "sqlalchemy.url",
+    settings.DATABASE_URL.replace("%", "%%"),
+)
 
 
 def run_migrations_offline() -> None:
-    """
-    Run migrations in offline mode.
-
-    In offline mode, Alembic generates SQL without
-    establishing a database connection.
-    """
+    url = config.get_main_option("sqlalchemy.url")
 
     context.configure(
-        url=settings.DATABASE_URL,
+        url=url,
         target_metadata=target_metadata,
         literal_binds=True,
         dialect_opts={"paramstyle": "named"},
@@ -41,15 +42,9 @@ def run_migrations_offline() -> None:
 
 
 def run_migrations_online() -> None:
-    """
-    Run migrations in online mode.
-
-    Creates a SQLAlchemy engine using the DATABASE_URL
-    from our application settings.
-    """
-
-    connectable = create_engine(
-        settings.DATABASE_URL,
+    connectable = engine_from_config(
+        config.get_section(config.config_ini_section, {}),
+        prefix="sqlalchemy.",
         poolclass=pool.NullPool,
     )
 
